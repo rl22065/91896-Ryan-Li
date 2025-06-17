@@ -1,8 +1,9 @@
 import easygui
 
 userExit = False 
+newlist = []
 
-task = {
+tasks = {
     "T1": {
         "title": "Design Homepage",
         "description": "Create a mockup of the homepage",
@@ -40,26 +41,40 @@ task = {
         },
     }
 
-member = {
+members = {
     "JSM": {
         "name": "John Smith",
         "email": "john@techvision.com",
-        "tasks assigned": ["T1","T2"]
+        "tasksAssigned": ["T1","T2"]
         },
     "JLO": {
         "name": "Jane Love",
         "email": "jane@techvision.com",
-        "tasks assigned": ["T4"]
+        "tasksAssigned": ["T4"]
         },
     "BDI": {
         "name": "Bob Dillon",
         "email": "bob@techvision.com",
-        "tasks assigned": ["T5"]
+        "tasksAssigned": ["T5"]
         },
     }
 
 def search():
-    pass
+    
+    input = (easygui.choicebox("Where would you like to search: ",
+                             choices=["Tasks", "Members"])).lower
+    if input == "tasks":
+        title = "title"
+        dict = tasks
+
+    elif input == "members":
+        title = "name"
+        dict = members
+    collectInput()    
+    for id in dict:
+        if collectInput in dict[id][title].lower():
+            newlist.append(dict[id][title])
+    easygui.msgbox(f"results: {newlist}" )
 
 def updateTask():
     pass
@@ -70,6 +85,28 @@ def report():
 def output():
     pass
 
+def newTask():
+    pass
+
+def collectInput():
+    search = easygui.enterbox((f"Please enter your query")).lower
+    return search
+
 while userExit != True:
     menu = easygui.choicebox("What would you like to do: ", 
-                             choices=["Search", "Update Task", "Report", "New Task"])
+                             choices=["Search", "Update Task",
+                                       "Report", "New Task"])
+    if menu == "Search":
+        search()
+
+    elif menu == "Update Task":
+        updateTask()
+
+    elif menu == "Report":
+        report()
+
+    elif menu == "New Task":
+        newTask()
+
+    elif menu is None:
+        break
