@@ -2,6 +2,7 @@ import easygui
 
 userExit = False 
 newlist = []
+idList = []
 
 tasks = {
     "T1": {
@@ -61,20 +62,34 @@ members = {
 
 def search():
     
-    input = (easygui.choicebox("Where would you like to search: ",
-                             choices=["Tasks", "Members"])).lower
-    if input == "tasks":
+    userChoice = easygui.buttonbox("Where would you like to search: ",
+                             choices=["Tasks", "Members"])
+    if userChoice == "Tasks":
         title = "title"
         dict = tasks
-
-    elif input == "members":
+    elif userChoice == "Members":
         title = "name"
         dict = members
-    collectInput()    
+
+    query = easygui.enterbox(f"Please enter your query")
     for id in dict:
-        if collectInput in dict[id][title].lower():
+        if query in dict[id][title].lower():
             newlist.append(dict[id][title])
-    easygui.msgbox(f"results: {newlist}" )
+            idList.append(id)
+    if newlist == []:
+        easygui.msgbox("No results found, are you sure \
+you typed everything in correctly?")
+    else:
+        detailed = easygui.buttonbox(f"results: {newlist}", 
+        choices=["Detailed View", "Exit"])
+        if detailed == "Detailed View":
+            for result in idList:
+                fancyOutput(dict, result, title)
+                
+
+        else:
+            pass
+
 
 def updateTask():
     pass
@@ -82,22 +97,27 @@ def updateTask():
 def report():
     pass
 
-def output():
-    pass
+def fancyOutput(dict, primaryKey, title):
+    output = [f"{dict[primaryKey][title]}"]
+
+    for key, value in dict[primaryKey].items():
+        output.append(f"{key}: {value}")
+        
+    easygui.msgbox("\n".join(output), title=dict[primaryKey][title])
+    
 
 def newTask():
     pass
 
-def collectInput():
-    search = easygui.enterbox((f"Please enter your query")).lower
-    return search
 
 while userExit != True:
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
                                        "Report", "New Task"])
     if menu == "Search":
+        newlist = []
         search()
+
 
     elif menu == "Update Task":
         updateTask()
