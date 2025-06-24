@@ -85,8 +85,10 @@ you typed everything in correctly?")
         if detailed == "Detailed View":
             for result in idList:
                 fancyOutput(dict, result, title)
-                
-
+                if fancyOutput(dict, result, title) == "next":
+                    pass
+                else:
+                    break
         else:
             pass
 
@@ -103,7 +105,14 @@ def fancyOutput(dict, primaryKey, title):
     for key, value in dict[primaryKey].items():
         output.append(f"{key}: {value}")
         
-    easygui.msgbox("\n".join(output), title=dict[primaryKey][title])
+    choice = easygui.buttonbox("\n".join(output), title=dict[primaryKey][title], 
+                        choices=["Next", "Exit"])
+    if choice == "Next":
+        return "next"
+    elif choice is None or choice == "Exit":
+        return "exit"
+        
+
     
 
 def newTask():
