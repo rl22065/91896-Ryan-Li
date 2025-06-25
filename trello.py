@@ -61,10 +61,11 @@ members = {
         },
     }
 
-def search():
+def search(pageNum):
     
     userChoice = easygui.buttonbox("Where would you like to search: ",
-                             choices=["Tasks", "Members"])
+                             choices=["Tasks", "Members"],
+                             title="Search")
     if userChoice == "Tasks":
         title = "title"
         dict = tasks
@@ -72,21 +73,28 @@ def search():
         title = "name"
         dict = members
 
-    query = easygui.enterbox(f"Please enter your query")
+    query = easygui.enterbox(f"Please enter your query",
+                             title="Search")
+    if query == None:
+        return
     for id in dict:
+        
         if query in dict[id][title].lower():
             newlist.append(dict[id][title])
             if id not in idList:
                 idList.append(id)
     if newlist == []:
         easygui.msgbox("No results found, are you sure \
-you typed everything in correctly?")
+you typed everything in correctly?",
+                        title="Error !!")
     else:
-        detailed = easygui.buttonbox(f"results: {newlist}", 
-        choices=["Detailed View", "Exit"])
+        detailed = easygui.buttonbox(f"Results: {newlist}", 
+        choices=["Detailed View", "Exit"],
+        title=f"Results: {len(newlist)} found")
         if detailed == "Detailed View":
             for result in idList:
-                if fancyOutput(dict, result, title) == "next":
+                if fancyOutput(dict, result, title, pageNum) == "next":
+                    pageNum += 1
                     pass
                 else:
                     break
@@ -100,7 +108,7 @@ def updateTask():
 def report():
     pass
 
-def fancyOutput(dict, primaryKey, title):
+def fancyOutput(dict, primaryKey, title, pageNum):
     output = [f"{dict[primaryKey][title]}"]
     
 
@@ -108,7 +116,7 @@ def fancyOutput(dict, primaryKey, title):
         output.append(f"{key}: {value}")
         
     choice = easygui.buttonbox("\n".join(output), 
-                        title=f"{1} of {len(idList)}",
+                        title=f"{pageNum} of {len(idList)}",
                         choices=["Next", "Exit"])
     if choice == "Next":
         return "next"
@@ -125,12 +133,13 @@ def newTask():
 while userExit != True:
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
-                                       "Report", "New Task"])
+                                       "Report", "New Task"],
+                             title="Menu")
     if menu == "Search":
         newlist = []
         idList = []
         pageNum = 1
-        search()
+        search(pageNum)
 
 
     elif menu == "Update Task":
