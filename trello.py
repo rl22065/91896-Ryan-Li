@@ -3,6 +3,7 @@ import easygui
 userExit = False 
 newlist = []
 idList = []
+pageNum = 1
 
 tasks = {
     "T1": {
@@ -75,7 +76,8 @@ def search():
     for id in dict:
         if query in dict[id][title].lower():
             newlist.append(dict[id][title])
-            idList.append(id)
+            if id not in idList:
+                idList.append(id)
     if newlist == []:
         easygui.msgbox("No results found, are you sure \
 you typed everything in correctly?")
@@ -84,7 +86,6 @@ you typed everything in correctly?")
         choices=["Detailed View", "Exit"])
         if detailed == "Detailed View":
             for result in idList:
-                fancyOutput(dict, result, title)
                 if fancyOutput(dict, result, title) == "next":
                     pass
                 else:
@@ -101,11 +102,13 @@ def report():
 
 def fancyOutput(dict, primaryKey, title):
     output = [f"{dict[primaryKey][title]}"]
+    
 
     for key, value in dict[primaryKey].items():
         output.append(f"{key}: {value}")
         
-    choice = easygui.buttonbox("\n".join(output), title=dict[primaryKey][title], 
+    choice = easygui.buttonbox("\n".join(output), 
+                        title=f"{1} of {len(idList)}",
                         choices=["Next", "Exit"])
     if choice == "Next":
         return "next"
@@ -125,6 +128,8 @@ while userExit != True:
                                        "Report", "New Task"])
     if menu == "Search":
         newlist = []
+        idList = []
+        pageNum = 1
         search()
 
 
