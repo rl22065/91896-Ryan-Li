@@ -72,13 +72,15 @@ def search(pageNum):
     elif userChoice == "Members":
         title = "name"
         dict = members
+    elif userChoice == None:
+        return
 
     query = easygui.enterbox(f"Please enter your query",
-                             title="Search")
+                             title="Search").lower()
     if query == None:
         return
-    for id in dict:
-        
+
+    for id in dict:        
         if query in dict[id][title].lower():
             newlist.append(dict[id][title])
             if id not in idList:
@@ -103,10 +105,26 @@ you typed everything in correctly?",
 
 
 def updateTask():
+    pass    
+
+
+def newTask():
     pass
+
 
 def report():
     pass
+
+
+def fullOutput(pageNum):
+    for i in tasks:
+        idList.append("")
+    for i in tasks:
+        if fancyOutput(tasks, i, "title", pageNum) == "next":
+            pageNum +=1
+            pass
+        else:
+            break
 
 def fancyOutput(dict, primaryKey, title, pageNum):
     output = [f"{dict[primaryKey][title]}"]
@@ -124,16 +142,11 @@ def fancyOutput(dict, primaryKey, title, pageNum):
         return "exit"
         
 
-    
-
-def newTask():
-    pass
-
-
 while userExit != True:
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
-                                       "Report", "New Task"],
+                                       "Report", "New Task",
+                                       "Task Collection"],
                              title="Menu")
     if menu == "Search":
         newlist = []
@@ -150,6 +163,11 @@ while userExit != True:
 
     elif menu == "New Task":
         newTask()
+
+    elif menu == "Task Collection":
+        idList = []
+        pageNum = 1
+        fullOutput(pageNum)
 
     elif menu is None:
         break
