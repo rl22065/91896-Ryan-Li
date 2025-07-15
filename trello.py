@@ -4,6 +4,8 @@ userExit = False
 newlist = []
 idList = []
 pageNum = 1
+catergories = ["title", "description", "assignee", "priority", "status"]
+memberList = []
 
 tasks = {
     "T1": {
@@ -80,11 +82,11 @@ def search(pageNum):
     if query == None:
         return
 
-    for id in dict:        
-        if query in dict[id][title].lower():
-            newlist.append(dict[id][title])
-            if id not in idList:
-                idList.append(id)
+    for taskId in dict:        
+        if query in dict[taskId][title].lower():
+            newlist.append(dict[taskId][title])
+            if taskId not in idList:
+                idList.append(taskId)
     if newlist == []:
         easygui.msgbox("No results found, are you sure \
 you typed everything in correctly?",
@@ -107,20 +109,43 @@ you typed everything in correctly?",
 def updateTask():
     pass    
 
+"""def addTask(catergories, memberList):
+    newTask = {}
+    for field in catergories:
+        if field in ["title","description"]:
+            value = easygui.enterbox(f"Please enter the {field}: ")
+        elif field == "assignee":
+            value = easygui.choicebox("Please assign the task: "
+                                      choices=memberList)
+        elif field == "status":
+            value = easygui.choicebox("Please assign a status: "choices=
+                                    ["In Progress", "Not Started", "Blocked"])
+        else:
+            value = easygui.enterbox("Please assign a priority: ")
+        newTask[field] = value
+    taskId = f"T{len(list(tasks)) + 1}"
+    tasks[taskId] = newTask
+    easygui.msgbox(f"New task '{newTask["title"]}'")"""
 
-def newTask():
-    pass
+
+
+
+
 
 
 def report():
     pass
 
 
+def varReset():
+    pass
+
+
 def fullOutput(pageNum):
-    for i in tasks:
+    for taskId in tasks:
         idList.append("")
-    for i in tasks:
-        if fancyOutput(tasks, i, "title", pageNum) == "next":
+    for taskId in tasks:
+        if fancyOutput(tasks, taskId, "title", pageNum) == "next":
             pageNum +=1
             pass
         else:
@@ -161,8 +186,8 @@ while userExit != True:
     elif menu == "Report":
         report()
 
-    elif menu == "New Task":
-        newTask()
+    #elif menu == "New Task":
+        #addTask(catergories, memberList)
 
     elif menu == "Task Collection":
         idList = []
