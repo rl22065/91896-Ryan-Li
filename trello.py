@@ -1,7 +1,7 @@
 import easygui
 
 userExit = False 
-newlist = []
+newList = []
 idList = []
 pageNum = 1
 catergories = ["title", "description", "assignee", "priority", "status"]
@@ -84,17 +84,17 @@ def search(pageNum):
 
     for taskId in dict:        
         if query in dict[taskId][title].lower():
-            newlist.append(dict[taskId][title])
+            newList.append(dict[taskId][title])
             if taskId not in idList:
                 idList.append(taskId)
-    if newlist == []:
+    if newList == []:
         easygui.msgbox("No results found, are you sure \
 you typed everything in correctly?",
                         title="Error !!")
     else:
-        detailed = easygui.buttonbox(f"Results: {newlist}", 
+        detailed = easygui.buttonbox(f"Results: {newList}", 
         choices=["Detailed View", "Exit"],
-        title=f"Results: {len(newlist)} found")
+        title=f"Results: {len(newList)} found")
         if detailed == "Detailed View":
             for result in idList:
                 if fancyOutput(dict, result, title, pageNum) == "next":
@@ -109,24 +109,31 @@ you typed everything in correctly?",
 def updateTask():
     pass    
 
-"""def addTask(catergories, memberList):
+def addTask(catergories):
+    for i in members:
+        memberList.append(members[i]["name"])
+    memberList.append("None")
     newTask = {}
+    value = ":3"
     for field in catergories:
-        if field in ["title","description"]:
-            value = easygui.enterbox(f"Please enter the {field}: ")
-        elif field == "assignee":
-            value = easygui.choicebox("Please assign the task: "
-                                      choices=memberList)
-        elif field == "status":
-            value = easygui.choicebox("Please assign a status: "choices=
-                                    ["In Progress", "Not Started", "Blocked"])
+        if value != None:
+            if field in ["title","description"]:
+                value = easygui.enterbox(f"Please enter the {field}: ")
+            elif field == "assignee":
+                value = easygui.choicebox("Please assign the task: ",
+                choices=memberList)
+            elif field == "status":
+                value = easygui.choicebox("Please assign a status: ",
+                choices=["In Progress", "Not Started", "Blocked"])
+            elif field == "priority":
+                value = easygui.enterbox("Please assign a priority: ")
         else:
-            value = easygui.enterbox("Please assign a priority: ")
+            return
         newTask[field] = value
     taskId = f"T{len(list(tasks)) + 1}"
     tasks[taskId] = newTask
-    easygui.msgbox(f"New task '{newTask["title"]}'")"""
-
+    easygui.msgbox("New task has been added")
+    
 
 
 
@@ -137,8 +144,12 @@ def report():
     pass
 
 
-def varReset():
-    pass
+def varReset(newList, idList, memberList, pageNum):
+    newList = []
+    idList = []
+    memberList = []
+    pageNum = 1
+    
 
 
 def fullOutput(pageNum):
@@ -168,17 +179,14 @@ def fancyOutput(dict, primaryKey, title, pageNum):
         
 
 while userExit != True:
+    varReset(newList, idList, memberList, pageNum)
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
                                        "Report", "New Task",
                                        "Task Collection"],
                              title="Menu")
     if menu == "Search":
-        newlist = []
-        idList = []
-        pageNum = 1
         search(pageNum)
-
 
     elif menu == "Update Task":
         updateTask()
@@ -186,12 +194,10 @@ while userExit != True:
     elif menu == "Report":
         report()
 
-    #elif menu == "New Task":
-        #addTask(catergories, memberList)
+    elif menu == "New Task":
+        addTask(catergories)
 
     elif menu == "Task Collection":
-        idList = []
-        pageNum = 1
         fullOutput(pageNum)
 
     elif menu is None:
