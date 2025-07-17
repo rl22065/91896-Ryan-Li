@@ -149,7 +149,29 @@ def varReset(newList, idList, memberList, pageNum):
     idList = []
     memberList = []
     pageNum = 1
-    
+    return newList, idList, memberList, pageNum
+
+def inputValidation(value, field):
+    if field in ["title","description"]:
+        if value.strip() == "":
+            easygui.msgbox(f"{field.upper()} cannot be empty!",
+                title="Error !!")
+            return "error"
+        else:
+            return "alg"
+    elif field == "priority":
+        if not type(value) is int:
+            easygui.msgbox(f"{field.upper()} must be an interger!",
+                title="Error !!")
+            return "error"
+        elif int(value) < 0 or int(value) > 3:
+            easygui.msgbox(f"{field.upper()} must be between 1 and 3!",
+                title="Error !!")
+            return "error"
+        else:
+            return "alg"
+
+
 
 
 def fullOutput(pageNum):
@@ -179,7 +201,8 @@ def fancyOutput(dict, primaryKey, title, pageNum):
         
 
 while userExit != True:
-    varReset(newList, idList, memberList, pageNum)
+    newList, idList, memberList, pageNum = (
+        varReset(newList, idList, memberList, pageNum))
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
                                        "Report", "New Task",
