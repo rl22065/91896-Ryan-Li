@@ -4,8 +4,9 @@ userExit = False
 newList = []
 idList = []
 pageNum = 1
-catergories = ["title", "description", "assignee", "priority", "status"]
+catergories = ["title", "description", "assignee", "status", "priority"]
 memberList = []
+history = ":3"
 
 tasks = {
     "T1": {
@@ -110,15 +111,18 @@ def updateTask():
     pass    
 
 def addTask(catergories):
+    global history
     for i in members:
         memberList.append(members[i]["name"])
     memberList.append("None")
     newTask = {}
-    value = ":3"
+    value = history
     for field in catergories:
         if value != None:
             if field in ["title","description"]:
-                value = easygui.enterbox(f"Please enter the {field}: ")
+                while inputValidation(value, field) != "alg":
+                    value = easygui.enterbox(f"Please enter the {field}: ")
+                history = value
             elif field == "assignee":
                 value = easygui.choicebox("Please assign the task: ",
                 choices=memberList)
@@ -126,7 +130,9 @@ def addTask(catergories):
                 value = easygui.choicebox("Please assign a status: ",
                 choices=["In Progress", "Not Started", "Blocked"])
             elif field == "priority":
-                value = easygui.enterbox("Please assign a priority: ")
+                value = history
+                while inputValidation(value, field) != "alg":
+                    value = int(easygui.enterbox("Please assign a priority: "))
         else:
             return
         newTask[field] = value
@@ -153,21 +159,30 @@ def varReset(newList, idList, memberList, pageNum):
 
 def inputValidation(value, field):
     if field in ["title","description"]:
-        if value.strip() == "":
+        if value == None:
+            return "alg"
+        elif value.strip() == "":
             easygui.msgbox(f"{field.upper()} cannot be empty!",
                 title="Error !!")
+            return "error"
+        elif history == value:
             return "error"
         else:
             return "alg"
     elif field == "priority":
-        if not type(value) is int:
-            easygui.msgbox(f"{field.upper()} must be an interger!",
+        if value == history:
+            return "error"        
+        elif value == None:
+            return "alg"
+        elif not type(value) is int:
+            easygui.msgbox(f"{field.upper()} must be an integer!",
                 title="Error !!")
             return "error"
         elif int(value) < 0 or int(value) > 3:
             easygui.msgbox(f"{field.upper()} must be between 1 and 3!",
                 title="Error !!")
             return "error"
+
         else:
             return "alg"
 
