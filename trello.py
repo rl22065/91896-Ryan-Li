@@ -6,7 +6,6 @@ idList = []
 pageNum = 1
 catergories = ["title", "description", "assignee", "status", "priority"]
 memberList = []
-history = ":3"
 
 tasks = {
     "T1": {
@@ -88,10 +87,8 @@ def search(pageNum):
             newList.append(dict[taskId][title])
             if taskId not in idList:
                 idList.append(taskId)
-    if newList == []:
-        easygui.msgbox("No results found, are you sure \
-you typed everything in correctly?",
-                        title="Error !!")
+    if inputValidation(newList, list) == "error":
+        return
     else:
         detailed = easygui.buttonbox(f"Results: {newList}", 
         choices=["Detailed View", "Exit"],
@@ -111,18 +108,17 @@ def updateTask():
     pass    
 
 def addTask(catergories):
-    global history
     for i in members:
         memberList.append(members[i]["name"])
     memberList.append("None")
     newTask = {}
-    value = history
+    value = ":3"
     for field in catergories:
         if value != None:
             if field in ["title","description"]:
-                while inputValidation(value, field) != "alg":
+                value = ":3"
+                while inputValidation(value, field) != "alg":                    
                     value = easygui.enterbox(f"Please enter the {field}: ")
-                history = value
             elif field == "assignee":
                 value = easygui.choicebox("Please assign the task: ",
                 choices=memberList)
@@ -130,9 +126,14 @@ def addTask(catergories):
                 value = easygui.choicebox("Please assign a status: ",
                 choices=["In Progress", "Not Started", "Blocked"])
             elif field == "priority":
-                value = history
+                value = ":3"
                 while inputValidation(value, field) != "alg":
-                    value = int(easygui.enterbox("Please assign a priority: "))
+                    try:
+                        value = int(easygui.enterbox("Please assign \
+a priority: "))
+                    except ValueError:
+                        easygui.msgbox(f"{field.upper()} must be an integer!",
+                            title="Error !!")
         else:
             return
         newTask[field] = value
@@ -165,12 +166,12 @@ def inputValidation(value, field):
             easygui.msgbox(f"{field.upper()} cannot be empty!",
                 title="Error !!")
             return "error"
-        elif history == value:
+        elif value == ":3":
             return "error"
         else:
             return "alg"
     elif field == "priority":
-        if value == history:
+        if value == ":3":
             return "error"        
         elif value == None:
             return "alg"
@@ -182,9 +183,17 @@ def inputValidation(value, field):
             easygui.msgbox(f"{field.upper()} must be between 1 and 3!",
                 title="Error !!")
             return "error"
-
         else:
             return "alg"
+    elif field == list:
+        if value == []:
+            easygui.msgbox("No results found, are you sure \
+you typed everything in correctly?",
+                title="Error !!")
+            return "error"
+        else:
+            return "alg"
+
 
 
 
