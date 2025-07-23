@@ -63,6 +63,7 @@ members = {
         },
     }
 
+
 def search(pageNum):
     
     userChoice = easygui.buttonbox("Where would you like to search: ",
@@ -104,8 +105,37 @@ def search(pageNum):
             pass
 
 
-def updateTask():
-    pass    
+def updateTask(catergories):
+    taskList = []
+    for i in tasks:
+        taskList.append(f"{i}: {tasks[i]["title"]}")
+    query = easygui.choicebox("Which task do you want to edit?",
+        choices= taskList)
+    field = easygui.choicebox("Which catergory would you like to edit?",
+        choices= catergories)
+    if field in ["title","description"]:
+        value = ":3"
+        while inputValidation(value, field) != "alg":                    
+            value = easygui.enterbox(f"Please enter the new {field}: ")
+    elif field == "assignee":
+        value = easygui.choicebox("Please assign a new member: ",
+        choices=memberList)
+    elif field == "status":
+        value = easygui.choicebox("Please assign a status: ",
+        choices=["In Progress", "Not Started", "Blocked"])
+    elif field == "priority":
+        value = ":3"
+        while inputValidation(value, field) != "alg":
+            try:
+                value = int(easygui.enterbox("Please assign \
+a new priority: "))
+            except ValueError:
+                easygui.msgbox(f"{field.upper()} must be an integer!",
+                    title="Error !!")
+    tasks[query][field] = value
+
+    
+    
 
 def addTask(catergories):
     for i in members:
@@ -148,7 +178,8 @@ a priority: "))
 
 
 def report():
-    pass
+    """easygui.msgbox("Changes made since last check:")
+    for i in """
 
 
 def varReset(newList, idList, memberList, pageNum):
@@ -236,7 +267,7 @@ while userExit != True:
         search(pageNum)
 
     elif menu == "Update Task":
-        updateTask()
+        updateTask(catergories)
 
     elif menu == "Report":
         report()
