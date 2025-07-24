@@ -106,6 +106,9 @@ def search(pageNum):
 
 
 def updateTask(catergories):
+    for i in members:
+        memberList.append(members[i]["name"])
+    memberList.append("None")
     taskList = []
     for i in tasks:
         taskList.append(f"{i}: {tasks[i]["title"]}")
@@ -132,7 +135,8 @@ a new priority: "))
             except ValueError:
                 easygui.msgbox(f"{field.upper()} must be an integer!",
                     title="Error !!")
-    tasks[query][field] = value
+    taskId = query.split(":")[0].strip()
+    tasks[taskId][field] = value
 
     
     
@@ -164,6 +168,8 @@ a priority: "))
                     except ValueError:
                         easygui.msgbox(f"{field.upper()} must be an integer!",
                             title="Error !!")
+                    except TypeError:
+                        return
         else:
             return
         newTask[field] = value
@@ -178,8 +184,7 @@ a priority: "))
 
 
 def report():
-    """easygui.msgbox("Changes made since last check:")
-    for i in """
+    pass
 
 
 def varReset(newList, idList, memberList, pageNum):
