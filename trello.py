@@ -2,7 +2,6 @@ import easygui
 
 userExit = False 
 newList = []
-idList = []
 pageNum = 1
 catergories = ["title", "description", "assignee", "status", "priority"]
 memberList = []
@@ -65,7 +64,7 @@ members = {
 
 
 def search(pageNum):
-    
+    idList = []
     userChoice = easygui.buttonbox("Where would you like to search: ",
                              choices=["Tasks", "Members"],
                              title="Search")
@@ -96,7 +95,7 @@ def search(pageNum):
         title=f"Results: {len(newList)} found")
         if detailed == "Detailed View":
             for result in idList:
-                if fancyOutput(dict, result, title, pageNum) == "next":
+                if fancyOutput(dict, result, title, pageNum, idList) == "next":
                     pageNum += 1
                     pass
                 else:
@@ -139,8 +138,6 @@ a new priority: "))
     tasks[taskId][field] = value
 
     
-    
-
 def addTask(catergories):
     for i in members:
         memberList.append(members[i]["name"])
@@ -178,21 +175,65 @@ a priority: "))
     easygui.msgbox("New task has been added")
     
 
+def report(pageNum):
+    noBlocked = []
+    noInProgress = []
+    noNotStarted = []
+
+    for taskId in tasks:
+        if tasks[taskId]["status"] == "Blocked":
+            noBlocked.append(tasks[taskId]["title"])
+        elif tasks[taskId]["status"] == "In Progress":
+            noInProgress.append(tasks[taskId]["title"])
+        elif tasks[taskId]["status"] == "Not Started":
+            noNotStarted.append(tasks[taskId]["title"])
+    choice = easygui.buttonbox(f"Total tasks: {len(tasks)} \n"
+                        f"Blocked: {len(noBlocked)} \n"
+                        f"In Progress: {len(noInProgress)} \n"
+                        f"Not Started: {len(noNotStarted)} \n",
+                        title="Report", choices=["Blocked",
+                                                "In Progress",
+                                                "Not Started",
+                                                "Exit"])
+    if choice == "Blocked":
+        if noBlocked == []:
+            easygui.msgbox("No tasks are blocked at the moment",
+                title="Report")
+        else:
+            if fancyOutput(tasks, taskId, "title", pageNum, noBlocked) == "next":
+                pageNum += 1
+                pass
+            else:
+                return
+    elif choice == "In Progress":
+        if noInProgress == []:
+            easygui.msgbox("No tasks are in progress at the moment",
+                title="Report")
+        else:
+            if fancyOutput(tasks, taskId, "title", pageNum, noInProgress) == "next":
+                pageNum += 1
+                pass
+            else:
+                return
+    elif choice == "Not Started": 
+        if noNotStarted == []:
+            easygui.msgbox("No tasks have not been started at the moment",
+                title="Report")
+        else:
+            if fancyOutput(tasks, taskId, "title", pageNum, noNotStarted) == "next":
+                pageNum += 1
+                pass
+            else:  
+                return
+    else:
+        return
 
 
-
-
-
-def report():
-    pass
-
-
-def varReset(newList, idList, memberList, pageNum):
+def varReset(newList, memberList, pageNum):
     newList = []
-    idList = []
     memberList = []
     pageNum = 1
-    return newList, idList, memberList, pageNum
+    return newList, memberList, pageNum
 
 def inputValidation(value, field):
     if field in ["title","description"]:
@@ -235,24 +276,25 @@ you typed everything in correctly?",
 
 
 def fullOutput(pageNum):
+    taskList = []
     for taskId in tasks:
-        idList.append("")
+        taskList.append("")
     for taskId in tasks:
-        if fancyOutput(tasks, taskId, "title", pageNum) == "next":
+        if fancyOutput(tasks, taskId, "title", pageNum, taskList) == "next":
             pageNum +=1
             pass
         else:
             break
 
-def fancyOutput(dict, primaryKey, title, pageNum):
-    output = [f"{dict[primaryKey][title]}"]
+def fancyOutput(dict, primaryKey, title, pageNum, list):
+    output = [f"{primaryKey}: {dict[primaryKey][title]}"]
     
 
     for key, value in dict[primaryKey].items():
         output.append(f"{key}: {value}")
         
     choice = easygui.buttonbox("\n".join(output), 
-                        title=f"{pageNum} of {len(idList)}",
+                        title=f"{pageNum} of {len(list)}",
                         choices=["Next", "Exit"])
     if choice == "Next":
         return "next"
@@ -261,8 +303,8 @@ def fancyOutput(dict, primaryKey, title, pageNum):
         
 
 while userExit != True:
-    newList, idList, memberList, pageNum = (
-        varReset(newList, idList, memberList, pageNum))
+    newList, memberList, pageNum = (
+        varReset(newList, memberList, pageNum))
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
                                        "Report", "New Task",
@@ -275,7 +317,7 @@ while userExit != True:
         updateTask(catergories)
 
     elif menu == "Report":
-        report()
+        report(pageNum)
 
     elif menu == "New Task":
         addTask(catergories)
