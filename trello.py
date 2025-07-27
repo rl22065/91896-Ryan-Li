@@ -64,6 +64,12 @@ members = {
 
 
 def search(pageNum):
+    """Searches through the tasks or members dictionaries based on user input.
+    Prompts the user for a query and displays results. The user can choose
+    to view detailed information about each result.
+    """
+
+
     idList = []
     userChoice = easygui.buttonbox("Where would you like to search: ",
                              choices=["Tasks", "Members"],
@@ -105,6 +111,12 @@ def search(pageNum):
 
 
 def updateTask(catergories):
+    """Updates a task in the tasks dictionary, prompting the user
+    for the task to update and the field to edit. Uses while loops
+    and an input validation function to ensure valid inputs.
+    """
+
+
     for i in members:
         memberList.append(members[i]["name"])
     memberList.append("None")
@@ -139,6 +151,12 @@ a new priority: "))
 
     
 def addTask(catergories):
+    """Adds a new task to the tasks dictionary,
+    prompting the user for each field. Uses while loops
+    and the input validation function to ensure valid inputs.
+    """
+
+
     for i in members:
         memberList.append(members[i]["name"])
     memberList.append("None")
@@ -176,9 +194,18 @@ a priority: "))
     
 
 def report(pageNum):
+    """Displays all the status of the tasks in a report, 
+    with the option to view details of each task.
+    Starts by displaying the total number of tasks and their statuses.
+    The user can choose to view tasks that are blocked, in progress, 
+    or not started. Uses the fancyOutput function to display each task's 
+    details. If there are no tasks in a category, it displays a message.
+    """
+
     noBlocked = []
     noInProgress = []
     noNotStarted = []
+    reportExit = False
 
     for taskId in tasks:
         if tasks[taskId]["status"] == "Blocked":
@@ -187,55 +214,78 @@ def report(pageNum):
             noInProgress.append(tasks[taskId]["title"])
         elif tasks[taskId]["status"] == "Not Started":
             noNotStarted.append(tasks[taskId]["title"])
-    choice = easygui.buttonbox(f"Total tasks: {len(tasks)} \n"
-                        f"Blocked: {len(noBlocked)} \n"
-                        f"In Progress: {len(noInProgress)} \n"
-                        f"Not Started: {len(noNotStarted)} \n",
-                        title="Report", choices=["Blocked",
-                                                "In Progress",
-                                                "Not Started",
-                                                "Exit"])
-    if choice == "Blocked":
-        if noBlocked == []:
-            easygui.msgbox("No tasks are blocked at the moment",
-                title="Report")
-        else:
-            if fancyOutput(tasks, taskId, "title", pageNum, noBlocked) == "next":
-                pageNum += 1
-                pass
+    while reportExit != True:
+        pageNum = 1
+        choice = easygui.buttonbox(f"Total tasks: {len(tasks)} \n"
+                            f"Blocked: {len(noBlocked)} \n"
+                            f"In Progress: {len(noInProgress)} \n"
+                            f"Not Started: {len(noNotStarted)} \n",
+                            title="Report", choices=["Blocked",
+                                                    "In Progress",
+                                                    "Not Started",
+                                                    "Exit"])
+        if choice == "Blocked":
+            if noBlocked == []:
+                easygui.msgbox("No tasks are blocked at the moment",
+                    title="Report")
             else:
-                return
-    elif choice == "In Progress":
-        if noInProgress == []:
-            easygui.msgbox("No tasks are in progress at the moment",
-                title="Report")
-        else:
-            if fancyOutput(tasks, taskId, "title", pageNum, noInProgress) == "next":
-                pageNum += 1
-                pass
+                for i in noBlocked:
+                    if fancyOutput(tasks, taskId, "title",
+                                    pageNum, noBlocked) == "next":
+                        pageNum += 1
+                        pass
+                    else:
+                        reportExit = True
+                        return  
+        elif choice == "In Progress":
+            if noInProgress == []:
+                easygui.msgbox("No tasks are in progress at the moment",
+                    title="Report")
             else:
-                return
-    elif choice == "Not Started": 
-        if noNotStarted == []:
-            easygui.msgbox("No tasks have not been started at the moment",
-                title="Report")
+                for i in noInProgress:
+                    if fancyOutput(tasks, taskId, "title", 
+                                   pageNum, noInProgress) == "next":
+                        pageNum += 1
+                        pass
+                    else:
+                        reportExit = True
+                        return
+        elif choice == "Not Started": 
+            if noNotStarted == []:
+                easygui.msgbox("No tasks are not started at the moment",
+                    title="Report")
+            else:
+                for i in noNotStarted:
+                    if fancyOutput(tasks, taskId, "title", 
+                                   pageNum, noNotStarted) == "next":
+                        pageNum += 1
+                        pass
+                    else:  
+                        reportExit = True
+                        return    
         else:
-            if fancyOutput(tasks, taskId, "title", pageNum, noNotStarted) == "next":
-                pageNum += 1
-                pass
-            else:  
-                return
-    else:
-        return
+            reportExit = True
+            return
 
 
 def varReset(newList, memberList, pageNum):
+    """Resets the variables used in the program to their initial state.
+    """
+
     newList = []
     memberList = []
     pageNum = 1
     return newList, memberList, pageNum
 
+
 def inputValidation(value, field):
+    """Validates the input based on the field type.
+    Returns "alg" if the input is valid, "error" if not.
+    The two return values are used to determine whether to continue or 
+    stop the input loop. "error" can be used to reset the user input in 
+    the backend. Displays error messages if the input is invalid.
+    """
+
     if field in ["title","description"]:
         if value == None:
             return "alg"
@@ -272,10 +322,11 @@ you typed everything in correctly?",
             return "alg"
 
 
-
-
-
 def fullOutput(pageNum):
+    """Uses the fancyOutput function to display all tasks in the tasks 
+    dictionary. It iterates through the tasks and displays each task's details.
+    """
+
     taskList = []
     for taskId in tasks:
         taskList.append("")
@@ -287,6 +338,11 @@ def fullOutput(pageNum):
             break
 
 def fancyOutput(dict, primaryKey, title, pageNum, list):
+    """Formats the output of a task or member in a user-friendly way.
+    Returns "next" to continue to the next item or "exit" to stop for 
+    use in loops.
+    """
+
     output = [f"{primaryKey}: {dict[primaryKey][title]}"]
     
 
