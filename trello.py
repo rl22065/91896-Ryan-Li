@@ -69,8 +69,10 @@ def search(pageNum):
     to view detailed information about each result.
     """
 
-
     idList = []
+
+    #Easygui buttonbox to choose between searching tasks or members
+    #Changes the title and dict variable based on user choice
     userChoice = easygui.buttonbox("Where would you like to search: ",
                              choices=["Tasks", "Members"],
                              title="Search")
@@ -82,12 +84,14 @@ def search(pageNum):
         dict = members
     elif userChoice == None:
         return
-
+    # Easygui enterbox to get the search query from the user
+    #If the user cancels, the function returns
     query = easygui.enterbox(f"Please enter your query",
                              title="Search").lower()
     if query == None:
         return
-
+    
+    #Append the query to the newList and idList if it matches
     for taskId in dict:        
         if query in dict[taskId][title].lower():
             newList.append(dict[taskId][title])
@@ -96,6 +100,8 @@ def search(pageNum):
     if inputValidation(newList, list) == "error":
         return
     else:
+        #Display the results in a buttonbox, with the option to view 
+        #details or exit
         detailed = easygui.buttonbox(f"Results: {newList}", 
         choices=["Detailed View", "Exit"],
         title=f"Results: {len(newList)} found")
@@ -116,17 +122,24 @@ def updateTask(catergories):
     and an input validation function to ensure valid inputs.
     """
 
+    taskList = []
 
+    #Creates the list to iterate through, is created at the start of the 
+    #function to ensure it is always up to date
     for i in members:
         memberList.append(members[i]["name"])
     memberList.append("None")
-    taskList = []
     for i in tasks:
         taskList.append(f"{i}: {tasks[i]["title"]}")
+
+    #Easygui choiceboxes to choose which task to edit and its field
     query = easygui.choicebox("Which task do you want to edit?",
         choices= taskList)
     field = easygui.choicebox("Which catergory would you like to edit?",
         choices= catergories)
+    #If and elif statements to determine which field to edit
+    #and prompt the user for the new value
+    #Uses ":3" as a placeholder and to avoid errors
     if field in ["title","description"]:
         value = ":3"
         while inputValidation(value, field) != "alg":                    
@@ -143,9 +156,18 @@ def updateTask(catergories):
             try:
                 value = int(easygui.enterbox("Please assign \
 a new priority: "))
+            #Value error because we force the user to input an int
+            #This can't be caught by the inputValidation function 
+            #so we catch it here and display an error message
             except ValueError:
                 easygui.msgbox(f"{field.upper()} must be an integer!",
                     title="Error !!")
+            #Type error because we force the user to input an int
+            #If the user cancels we would get a TypeError
+            #This isn't caught by the inputValidation function as we 
+            #can't validate the input before it is entered
+            except TypeError:
+                return
     taskId = query.split(":")[0].strip()
     tasks[taskId][field] = value
 
@@ -156,12 +178,17 @@ def addTask(catergories):
     and the input validation function to ensure valid inputs.
     """
 
-
+    # Creates a list of members to assign the task to
     for i in members:
         memberList.append(members[i]["name"])
+    #Adds "None" to the list to allow for no assignee
     memberList.append("None")
     newTask = {}
     value = ":3"
+    #Iterates through the catergories and prompts the user for each 
+    #field. Uses ":3" as a placeholder to avoid errors
+    #Uses the inputValidation function to ensure valid inputs
+    #If the user cancels, the function returns
     for field in catergories:
         if value != None:
             if field in ["title","description"]:
@@ -181,8 +208,14 @@ def addTask(catergories):
                         value = int(easygui.enterbox("Please assign \
 a priority: "))
                     except ValueError:
+                    #Value error because we typecast the user input to
+                    #an int this can't be caught by the inputValidation 
+                    #function,
+                    #so we catch it here and display an error message
                         easygui.msgbox(f"{field.upper()} must be an integer!",
                             title="Error !!")
+                    #If the user cancels we would get a TypeError
+                    #so we catch it and return
                     except TypeError:
                         return
         else:
@@ -202,11 +235,14 @@ def report(pageNum):
     details. If there are no tasks in a category, it displays a message.
     """
 
+    #Creates lists to hold tasks based on their status
+    #and a boolean to exit the report loop
     noBlocked = []
     noInProgress = []
     noNotStarted = []
     reportExit = False
-
+    #Iterates through the tasks dictionary and appends the task title
+    #to the appropriate list based on status
     for taskId in tasks:
         if tasks[taskId]["status"] == "Blocked":
             noBlocked.append(tasks[taskId]["title"])
@@ -216,6 +252,9 @@ def report(pageNum):
             noNotStarted.append(tasks[taskId]["title"])
     while reportExit != True:
         pageNum = 1
+        #Displays the total number of tasks and their statuses
+        #Uses easygui buttonbox to allow the user to choose which
+        #report to view in more detail
         choice = easygui.buttonbox(f"Total tasks: {len(tasks)} \n"
                             f"Blocked: {len(noBlocked)} \n"
                             f"In Progress: {len(noInProgress)} \n"
@@ -224,6 +263,10 @@ def report(pageNum):
                                                     "In Progress",
                                                     "Not Started",
                                                     "Exit"])
+        #For each status, it checks if the list is empty
+        #If yes, it displays a message saying there are no tasks in that 
+        #category if not, it iterates through the list and displays each 
+        #task's details using the fancyOutput function
         if choice == "Blocked":
             if noBlocked == []:
                 easygui.msgbox("No tasks are blocked at the moment",
@@ -272,6 +315,7 @@ def varReset(newList, memberList, pageNum):
     """Resets the variables used in the program to their initial state.
     """
 
+    #Clears the newList and memberList, and resets the pageNum to 1
     newList = []
     memberList = []
     pageNum = 1
@@ -286,22 +330,36 @@ def inputValidation(value, field):
     the backend. Displays error messages if the input is invalid.
     """
 
+    #Uses if and elif statements to check the field type
+    #and validate the input accordingly
     if field in ["title","description"]:
         if value == None:
+            #If the value is None, it returns "alg" to continue back to 
+            #the main menu
             return "alg"
+        #Checks if the value is a string and not empty,
+        #if it is, it returns "error"
         elif value.strip() == "":
             easygui.msgbox(f"{field.upper()} cannot be empty!",
                 title="Error !!")
             return "error"
+        #Checks if value is ":3" which is a placeholder,
+        #if it is, it returns a silent "error". This can be used to 
+        #reset the user input in the backend
         elif value == ":3":
             return "error"
         else:
+            #if the value is valid, it returns "alg" to continue
             return "alg"
     elif field == "priority":
         if value == ":3":
             return "error"        
         elif value == None:
             return "alg"
+        #Checks if the value is an integer
+        #If it is not, it displays an error message and returns "error"
+        #If it is an integer, it checks if it is between 1 and 3
+        #If it is not, it displays an error message and returns "error"
         elif not type(value) is int:
             easygui.msgbox(f"{field.upper()} must be an integer!",
                 title="Error !!")
@@ -312,6 +370,9 @@ def inputValidation(value, field):
             return "error"
         else:
             return "alg"
+    #If the field is a list, it checks if the value is empty.
+    #If it is, it displays an error message and returns "error",
+    #If it is not, it returns "alg" to continue
     elif field == list:
         if value == []:
             easygui.msgbox("No results found, are you sure \
@@ -328,8 +389,12 @@ def fullOutput(pageNum):
     """
 
     taskList = []
+    #Appends ":3" to the taskList for each task in the dict. This is so 
+    #the pageNum can be displayed correctly in the fancyOutput function
     for taskId in tasks:
-        taskList.append("")
+        taskList.append(":3")
+    #Iterates through the tasks dictionary and uses the fancyOutput 
+    #function to display each task's details
     for taskId in tasks:
         if fancyOutput(tasks, taskId, "title", pageNum, taskList) == "next":
             pageNum +=1
@@ -343,12 +408,18 @@ def fancyOutput(dict, primaryKey, title, pageNum, list):
     use in loops.
     """
 
+    #Creates a list to hold the output, and also appends the title of 
+    #the output to the top of the list
     output = [f"{primaryKey}: {dict[primaryKey][title]}"]
     
-
+    #Iterates through the dictionary and appends each key value pair to 
+    #the output list
     for key, value in dict[primaryKey].items():
         output.append(f"{key}: {value}")
-        
+    
+    #Uses easygui buttonbox to display one page of output at a time
+    #The user can choose to go to the next page or exit
+    #The pageNum is displayed in the title of the buttonbox
     choice = easygui.buttonbox("\n".join(output), 
                         title=f"{pageNum} of {len(list)}",
                         choices=["Next", "Exit"])
@@ -359,8 +430,11 @@ def fancyOutput(dict, primaryKey, title, pageNum, list):
         
 
 while userExit != True:
+    #Resets the variables at the start of each loop
     newList, memberList, pageNum = (
         varReset(newList, memberList, pageNum))
+    #Uses easygui choicebox to display the main menu and get the user's 
+    #choice
     menu = easygui.choicebox("What would you like to do: ", 
                              choices=["Search", "Update Task",
                                        "Report", "New Task",
