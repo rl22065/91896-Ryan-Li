@@ -86,9 +86,13 @@ def search(pageNum):
         return
     # Easygui enterbox to get the search query from the user
     #If the user cancels, the function returns
-    query = easygui.enterbox(f"Please enter your query",
-                             title="Search").lower()
-    if query == None:
+    #AttributeError is raised if the user cancels the input box
+    try: 
+        query = ":3"
+        while inputValidation(query, str) != "alg":
+            query = easygui.enterbox(f"Please enter your query",
+                                        title="Search").lower()
+    except AttributeError:
         return
     
     #Append the query to the newList and idList if it matches
@@ -135,14 +139,18 @@ def updateTask(catergories):
     #Easygui choiceboxes to choose which task to edit and its field
     query = easygui.choicebox("Which task do you want to edit?",
         choices= taskList)
+    if query is None:
+        return
     field = easygui.choicebox("Which catergory would you like to edit?",
         choices= catergories)
+    if field is None:
+        return
     #If and elif statements to determine which field to edit
     #and prompt the user for the new value
     #Uses ":3" as a placeholder and to avoid errors
     if field in ["title","description"]:
         value = ":3"
-        while inputValidation(value, field) != "alg":                    
+        while inputValidation(value, field) != "alg":
             value = easygui.enterbox(f"Please enter the new {field}: ")
     elif field == "assignee":
         value = easygui.choicebox("Please assign a new member: ",
@@ -330,28 +338,13 @@ def inputValidation(value, field):
     the backend. Displays error messages if the input is invalid.
     """
 
+    #Changes the field type to str if it is title or description
+    if field in ["title", "description"]:
+        field = str
+
     #Uses if and elif statements to check the field type
     #and validate the input accordingly
-    if field in ["title","description"]:
-        if value == None:
-            #If the value is None, it returns "alg" to continue back to 
-            #the main menu
-            return "alg"
-        #Checks if the value is a string and not empty,
-        #if it is, it returns "error"
-        elif value.strip() == "":
-            easygui.msgbox(f"{field.upper()} cannot be empty!",
-                title="Error !!")
-            return "error"
-        #Checks if value is ":3" which is a placeholder,
-        #if it is, it returns a silent "error". This can be used to 
-        #reset the user input in the backend
-        elif value == ":3":
-            return "error"
-        else:
-            #if the value is valid, it returns "alg" to continue
-            return "alg"
-    elif field == "priority":
+    if field == "priority":
         if value == ":3":
             return "error"        
         elif value == None:
@@ -381,7 +374,23 @@ you typed everything in correctly?",
             return "error"
         else:
             return "alg"
-
+    elif field == str:
+        if value == None:
+            return "alg"
+        #Checks if the value is a string and not empty,
+        #if it is, it returns "error"
+        elif value.strip() == "":
+            easygui.msgbox("Input cannot be empty!",
+                title="Error !!")
+            return "error"
+        #Checks if value is ":3" which is a placeholder,
+        #if it is, it returns a silent "error". This can be used to 
+        #reset the user input in the backend
+        elif value == ":3":
+            return "error"
+        else:
+            #if the value is valid, it returns "alg" to continue
+            return "alg"
 
 def fullOutput(pageNum):
     """Uses the fancyOutput function to display all tasks in the tasks 
