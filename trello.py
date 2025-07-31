@@ -156,11 +156,14 @@ def updateTask(catergories):
     # Uses ":3" as a placeholder and to avoid errors.
     if field in ["title","description"]:
         value = ":3"
+        # Uses a while loop to ensure the user inputs a valid value.
         while inputValidation(value, field) != "alg":
             value = easygui.enterbox(f"Please enter the new {field}: ")
     elif field == "assignee":
         value2 = easygui.choicebox("Please assign a new member: ",
         choices=memberList)
+        # If the user selects a member, we set the value to their ID.
+        # If the user selects "None", we set the value to "None".
         if value2 != "None":
             value = memberIdList[memberList.index(value2)]
         else:
@@ -258,6 +261,8 @@ a priority: "))
         newTask[field] = value
     taskId = f"T{len(list(tasks)) + 1}"
     tasks[taskId] = newTask
+    # If the assignee is not "None", we add the task to their
+    # tasksAssigned list.
     if newTask["assignee"] != "None":
         index = memberList.index(assignee)
         members[memberIdList[index]]["tasksAssigned"].append(taskId)
