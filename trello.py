@@ -160,7 +160,10 @@ def updateTask(catergories):
     elif field == "assignee":
         value2 = easygui.choicebox("Please assign a new member: ",
         choices=memberList)
-        value = memberIdList[memberList.index(value2)]
+        if value2 != "None":
+            value = memberIdList[memberList.index(value2)]
+        else:
+            value = value2
     elif field == "status":
         value = easygui.choicebox("Please assign a status: ",
         choices=["In Progress", "Not Started", "Blocked", "Completed"])
