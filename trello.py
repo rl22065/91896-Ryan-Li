@@ -204,7 +204,6 @@ a new priority: "))
     tasks[taskId][field] = value
 
 
-    
 def addTask(catergories):
     """Adds a new task to the tasks dictionary,
     prompting the user for each field. Uses while loops
@@ -456,6 +455,7 @@ you typed everything in correctly?",
             # if the value is valid, it returns "alg" to continue.
             return "alg"
 
+
 def fullOutput(pageNum):
     """Uses the fancyOutput function to display all tasks in the tasks 
     dictionary. It iterates through the tasks and displays each task's 
@@ -476,6 +476,7 @@ def fullOutput(pageNum):
             pass
         else:
             break
+
 
 def fancyOutput(dict, primaryKey, title, pageNum, list):
     """Formats the output of a task or member in a user-friendly way.
