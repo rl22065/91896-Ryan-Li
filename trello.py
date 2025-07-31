@@ -5,6 +5,9 @@ newList = []
 pageNum = 1
 catergories = ["title", "description", "assignee", "status", "priority"]
 memberList = []
+MINPRIORITY = 1
+MAXPRIORITY = 3
+
 
 tasks = {
     "T1": {
@@ -84,7 +87,7 @@ def search(pageNum):
         dict = members
     elif userChoice == None:
         return
-    # Easygui enterbox to get the search query from the user
+    #Easygui enterbox to get the search query from the user
     #If the user cancels, the function returns
     #AttributeError is raised if the user cancels the input box
     try: 
@@ -303,6 +306,9 @@ def report(pageNum):
                 easygui.msgbox("No tasks are blocked at the moment",
                     title="Report")
             else:
+                #Iterates through the given list, then creates a primary
+                #key to tell the fancyOutput function which tasks to
+                #display, using only the name of the task
                 for i in noBlocked:
                     for taskId in tasks:
                         if tasks[taskId]["title"] == i:
@@ -405,7 +411,7 @@ def inputValidation(value, field):
             easygui.msgbox(f"{field.upper()} must be an integer!",
                 title="Error !!")
             return "error"
-        elif int(value) < 0 or int(value) > 3:
+        elif int(value) < MINPRIORITY or int(value) > MAXPRIORITY:
             easygui.msgbox(f"{field.upper()} must be between 1 and 3!",
                 title="Error !!")
             return "error"
@@ -442,7 +448,8 @@ you typed everything in correctly?",
 
 def fullOutput(pageNum):
     """Uses the fancyOutput function to display all tasks in the tasks 
-    dictionary. It iterates through the tasks and displays each task's details.
+    dictionary. It iterates through the tasks and displays each task's 
+    details.
     """
 
     taskList = []
