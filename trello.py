@@ -124,7 +124,7 @@ def search(pageNum):
 
 
 def updateTask(catergories):
-    """Updates a task in the tasks dictionary, prompting the user
+    """Updates a task in the tasks dictionary, prompting the user   
     for the task to update and the field to edit. Uses while loops
     and an input validation function to ensure valid inputs.
     """
@@ -139,7 +139,8 @@ def updateTask(catergories):
         memberList.append(members[i]["name"])
     memberList.append("None")
     for i in tasks:
-        taskList.append(f"{i}: {tasks[i]["title"]}")
+        if tasks[i]["status"] != "Completed":
+            taskList.append(f"{i}: {tasks[i]["title"]}")
 
     #Easygui choiceboxes to choose which task to edit and its field
     query = easygui.choicebox("Which task do you want to edit?",
@@ -194,6 +195,12 @@ a new priority: "))
                 members[i]["tasksAssigned"].remove(taskId)
         #Then we add the task to the new member's tasksAssigned list
         members[value]["tasksAssigned"].append(taskId)
+    elif value == "Completed":
+        #If the task is completed, we remove it from the tasksAssigned 
+        #list of the member who was assigned to it
+        for i in members:
+            if taskId in members[i]["tasksAssigned"]:
+                members[i]["tasksAssigned"].remove(taskId)
     tasks[taskId][field] = value
 
 
