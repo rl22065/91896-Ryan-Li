@@ -127,10 +127,12 @@ def updateTask(catergories):
     """
 
     taskList = []
+    memberIdList = []
 
     #Creates the list to iterate through, is created at the start of the 
     #function to ensure it is always up to date
     for i in members:
+        memberIdList.append(i)
         memberList.append(members[i]["name"])
     memberList.append("None")
     for i in tasks:
@@ -153,11 +155,12 @@ def updateTask(catergories):
         while inputValidation(value, field) != "alg":
             value = easygui.enterbox(f"Please enter the new {field}: ")
     elif field == "assignee":
-        value = easygui.choicebox("Please assign a new member: ",
+        value2 = easygui.choicebox("Please assign a new member: ",
         choices=memberList)
+        value = memberIdList[memberList.index(value2)]
     elif field == "status":
         value = easygui.choicebox("Please assign a status: ",
-        choices=["In Progress", "Not Started", "Blocked"])
+        choices=["In Progress", "Not Started", "Blocked", "Completed"])
     elif field == "priority":
         value = ":3"
         while inputValidation(value, field) != "alg":
@@ -177,7 +180,16 @@ a new priority: "))
             except TypeError:
                 return
     taskId = query.split(":")[0].strip()
+    if value != "None" and field == "assignee":
+        for i in members:
+            #If the task is already assigned to a member, we remove it 
+            #from their tasksAssigned list
+            if taskId in members[i]["tasksAssigned"]:
+                members[i]["tasksAssigned"].remove(taskId)
+        #Then we add the task to the new member's tasksAssigned list
+        members[value]["tasksAssigned"].append(taskId)
     tasks[taskId][field] = value
+
 
     
 def addTask(catergories):
@@ -186,9 +198,11 @@ def addTask(catergories):
     and the input validation function to ensure valid inputs.
     """
 
-    # Creates a list of members to assign the task to
+    memberIdList = []
+    #Creates a list of members to assign the task to
     for i in members:
         memberList.append(members[i]["name"])
+        memberIdList.append(i)
     #Adds "None" to the list to allow for no assignee
     memberList.append("None")
     newTask = {}
@@ -206,6 +220,7 @@ def addTask(catergories):
             elif field == "assignee":
                 value = easygui.choicebox("Please assign the task: ",
                 choices=memberList)
+                assignee = value
             elif field == "status":
                 value = easygui.choicebox("Please assign a status: ",
                 choices=["In Progress", "Not Started", "Blocked"])
@@ -231,6 +246,9 @@ a priority: "))
         newTask[field] = value
     taskId = f"T{len(list(tasks)) + 1}"
     tasks[taskId] = newTask
+    if newTask["assignee"] != "None":
+        index = memberList.index(assignee)
+        members[memberIdList[index]]["tasksAssigned"].append(taskId)
     easygui.msgbox("New task has been added")
     
 
@@ -248,6 +266,7 @@ def report(pageNum):
     noBlocked = []
     noInProgress = []
     noNotStarted = []
+    noCompleted = []
     reportExit = False
     #Iterates through the tasks dictionary and appends the task title
     #to the appropriate list based on status
@@ -258,6 +277,8 @@ def report(pageNum):
             noInProgress.append(tasks[taskId]["title"])
         elif tasks[taskId]["status"] == "Not Started":
             noNotStarted.append(tasks[taskId]["title"])
+        elif tasks[taskId]["status"] == "Completed":
+            noCompleted.append(tasks[taskId]["title"])
     while reportExit != True:
         pageNum = 1
         #Displays the total number of tasks and their statuses
@@ -266,10 +287,12 @@ def report(pageNum):
         choice = easygui.buttonbox(f"Total tasks: {len(tasks)} \n"
                             f"Blocked: {len(noBlocked)} \n"
                             f"In Progress: {len(noInProgress)} \n"
-                            f"Not Started: {len(noNotStarted)} \n",
+                            f"Not Started: {len(noNotStarted)} \n"
+                            f"Completed: {len(noCompleted)} \n",
                             title="Report", choices=["Blocked",
                                                     "In Progress",
                                                     "Not Started",
+                                                    "Completed",
                                                     "Exit"])
         #For each status, it checks if the list is empty
         #If yes, it displays a message saying there are no tasks in that 
@@ -281,39 +304,64 @@ def report(pageNum):
                     title="Report")
             else:
                 for i in noBlocked:
-                    if fancyOutput(tasks, taskId, "title",
-                                    pageNum, noBlocked) == "next":
-                        pageNum += 1
-                        pass
-                    else:
-                        reportExit = True
-                        return  
+                    for taskId in tasks:
+                        if tasks[taskId]["title"] == i:
+                            pk = taskId
+                            if fancyOutput(tasks, pk, "title",
+                                            pageNum, noBlocked) == "next":
+                                pageNum += 1
+                                pass
+                            else:
+                                reportExit = True
+                                return  
         elif choice == "In Progress":
             if noInProgress == []:
                 easygui.msgbox("No tasks are in progress at the moment",
                     title="Report")
             else:
                 for i in noInProgress:
-                    if fancyOutput(tasks, taskId, "title", 
-                                   pageNum, noInProgress) == "next":
-                        pageNum += 1
-                        pass
-                    else:
-                        reportExit = True
-                        return
+                    for taskId in tasks:
+                        if tasks[taskId]["title"] == i:
+                            pk = taskId
+                            if fancyOutput(tasks, pk, "title",
+                                            pageNum, noInProgress) == "next":
+                                pageNum += 1
+                                pass
+                            else:
+                                reportExit = True
+                                return  
         elif choice == "Not Started": 
             if noNotStarted == []:
                 easygui.msgbox("No tasks are not started at the moment",
                     title="Report")
             else:
                 for i in noNotStarted:
-                    if fancyOutput(tasks, taskId, "title", 
-                                   pageNum, noNotStarted) == "next":
-                        pageNum += 1
-                        pass
-                    else:  
-                        reportExit = True
-                        return    
+                    for taskId in tasks:
+                        if tasks[taskId]["title"] == i:
+                            pk = taskId
+                            if fancyOutput(tasks, pk, "title",
+                                            pageNum, noNotStarted) == "next":
+                                pageNum += 1
+                                pass
+                            else:
+                                reportExit = True
+                                return  
+        elif choice == "Completed":
+            if noCompleted == []:
+                easygui.msgbox("No tasks are completed at the moment",
+                    title="Report")
+            else:
+                for i in noCompleted:
+                    for taskId in tasks:
+                        if tasks[taskId]["title"] == i:
+                            pk = taskId
+                            if fancyOutput(tasks, pk, "title",
+                                            pageNum, noCompleted) == "next":
+                                pageNum += 1
+                                pass
+                            else:
+                                reportExit = True
+                                return  
         else:
             reportExit = True
             return
