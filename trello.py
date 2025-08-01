@@ -417,14 +417,9 @@ def inputValidation(value, field):
         elif value == None:
             return "alg"
         # Checks if the value is an integer.
-        # If it is not, it displays an error message and returns 
-        # "error". If it is an integer, it checks if it is between 
+        # If it is an integer, it checks if it is between 
         # 1 and 3. If it is not, it displays an error message and 
         # returns "error".
-        elif not type(value) is int:
-            easygui.msgbox(f"{field.upper()} must be an integer!",
-                title="Error !!")
-            return "error"
         elif int(value) < MINPRIORITY or int(value) > MAXPRIORITY:
             easygui.msgbox(f"{field.upper()} must be between 1 and 3!",
                 title="Error !!")
